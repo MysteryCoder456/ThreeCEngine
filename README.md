@@ -1,2 +1,2 @@
 # ThreeCEngine
-ThreeCEngine made for C++
+ThreeDEngine port for C++. This project uses the [olcPixelGameEngine](https://github.com/OneLoneCoder/olcPixelGameEngine) as a base renderer and for other game engine stuff like input. If you already are familiar with olcPGE then it is very easy to use ThreeCEngine.
