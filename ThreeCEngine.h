@@ -53,9 +53,9 @@ namespace tce
 	=======================================================================================================================
 		 _____						___
 		/			|			   /   \
-		|			|			  /_____\
-		|			|			 /	     \
-		\_____		|______		/	      \
+		|			|			  /_____\		  ______
+		|			|			 /	     \				\
+		\_____		|______		/	      \		________/
 
 	=======================================================================================================================
 	*/
@@ -66,7 +66,7 @@ namespace tce
 		float x;
 		float y;
 
-		Vec2D(float x, float y)
+		Vec2D(float x, float y) 
 		{
 			this->x = x;
 			this->y = y;
@@ -119,9 +119,9 @@ namespace tce
 				int length = face.size();
 				for (int j = 0; j < length - 2; j++)
 				{
-					game->DrawTriangle(face[j].asOLCvf2d(), face[j + 1].asOLCvf2d(), face[j + 2].asOLCvf2d());
+					game->FillTriangle(face[j].asOLCvf2d(), face[j + 1].asOLCvf2d(), face[j + 2].asOLCvf2d());
 				}
-				game->DrawTriangle(face[length - 1].asOLCvf2d(), face.back().asOLCvf2d(), face.front().asOLCvf2d());
+				game->FillTriangle(face[length - 2].asOLCvf2d(), face.back().asOLCvf2d(), face.front().asOLCvf2d());
 			}
 
 			renderPipeline.clear();
@@ -132,14 +132,14 @@ namespace tce
 	class Face
 	{
 	public:
-		Renderer* renderer;
 		std::vector<Vec3D> vertices;
+		Renderer* renderer;
 
-		/*Face(std::vector<Vec3D> vertices, Renderer* renderer)
+		Face(std::vector<Vec3D> vertices, Renderer* renderer)
 		{
-			this->renderer = renderer;
 			this->vertices = vertices;
-		}*/
+			this->renderer = renderer;
+		}
 
 		void addToRenderPipeline()
 		{
