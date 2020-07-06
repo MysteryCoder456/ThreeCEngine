@@ -44,119 +44,141 @@
 
 #pragma once
 
+#define INVALID 69420
+
 #include <iostream>
 #include "olcPixelGameEngine.h"
 
 namespace tce
 {
-	/*
-	=======================================================================================================================
-		 _____						___
-		/			|			   /   \
-		|			|			  /_____\		  ______
-		|			|			 /	     \				\
-		\_____		|______		/	      \		________/
+    class Vec2D
+    {
+    public:
+        float x;
+        float y;
 
-	=======================================================================================================================
-	*/
+        Vec2D(float x, float y)
+        {
+            this->x = x;
+            this->y = y;
+        }
 
-	class Vec2D
-	{
-	public:
-		float x;
-		float y;
+        olc::vf2d asOLCvf2d()
+        {
+            return olc::vf2d(x, y);
+        }
+    };
 
-		Vec2D(float x, float y) 
-		{
-			this->x = x;
-			this->y = y;
-		}
+    class Vec3D
+    {
+    public:
+        float x;
+        float y;
+        float z;
 
-		olc::vf2d asOLCvf2d()
-		{
-			return olc::vf2d(x, y);
-		}
-	};
+        Vec3D(float x, float y, float z)
+        {
+            this->x = x;
+            this->y = y;
+            this->z = z;
+        }
+    };
 
+    /// ONLY TO BE USED BY THE RENDERER CLASS
+    // YOU CAN CHANGE THE OPTIONS BY REFERING TO THEM FROM A RENDERER INSTANCE
+    struct Options
+    {
+        float fov = 100;
+        float renderDistance[2] = {10, 500};
+    };
 
-	class Vec3D
-	{
-	public:
-		float x;
-		float y;
-		float z;
+    // ONLY TO BE USED BY THE RENDERER CLASS
+    // YOU CAN CHANGE THE CAMERA PROPERTIES BY REFERING TO THEM FROM A RENDERER INSTANCE
+    struct Camera
+    {
+        Vec3D position = Vec3D(0, 0, 0);
+    };
 
-		Vec3D(float x, float y, float z)
-		{
-			this->x = x;
-			this->y = y;
-			this->z = z;
-		}
-	};
+    class Renderer
+    {
+    public:
+        olc::PixelGameEngine *game;
+        Options options;
+        Camera camera;
+        std::vector<std::vector<Vec2D>> renderPipeline;
 
+        Renderer(olc::PixelGameEngine *game)
+        {
+            this->game = game;
+        }
 
-	class Renderer
-	{
-	public:
-		olc::PixelGameEngine* game;
-		std::vector<std::vector<Vec2D>> renderPipeline;
+        Vec2D getProjectedVertex(Vec3D vertex)
+        {
+            if (vertex.z > options.renderDistance[0] + camera.position.z && vertex.z < options.renderDistance[1] + camera.position.z)
+            {
+                Vec2D projectedVertex = Vec2D(
+                    options.fov * (vertex.x - camera.position.x) / (vertex.z - camera.position.z),
+                    options.fov * (vertex.y - camera.position.y) / (vertex.z - camera.position.z));
+                return projectedVertex;
+            }
+            else
+            {
+                return Vec2D(INVALID, INVALID);
+            }
+        }
 
-		Renderer(olc::PixelGameEngine* game)
-		{
-			this->game = game;
-		}
+        bool vertexIsValid(Vec2D vertex)
+        {
+            return !(vertex.x == INVALID && vertex.y == INVALID);
+        }
 
-		Vec2D getProjectedVertex(Vec3D vertex)
-		{
-			return Vec2D(vertex.x, vertex.y); // Projection algorithm yet to be added
-		}
+        void render()
+        {
+            for (int i = 0; i < renderPipeline.size(); i++)
+            {
+                std::vector<Vec2D> face = renderPipeline[i];
+                int length = face.size();
+                for (int j = 0; j < length - 2; j++)
+                {
+                    if (vertexIsValid(face[j]) && vertexIsValid(face[j + 1]) && vertexIsValid(face[j + 2]))
+                        game->FillTriangle(face[j].asOLCvf2d(), face[j + 1].asOLCvf2d(), face[j + 2].asOLCvf2d());
+                }
+                if (vertexIsValid(face.back()) && vertexIsValid(face.front()) && vertexIsValid(face[0]))
+                    game->FillTriangle(face[length - 2].asOLCvf2d(), face.back().asOLCvf2d(), face.front().asOLCvf2d());
+            }
 
-		void render()
-		{
-			for (int i = 0; i < renderPipeline.size(); i++)
-			{
-				std::vector<Vec2D> face = renderPipeline[i];
-				int length = face.size();
-				for (int j = 0; j < length - 2; j++)
-				{
-					game->FillTriangle(face[j].asOLCvf2d(), face[j + 1].asOLCvf2d(), face[j + 2].asOLCvf2d());
-				}
-				game->FillTriangle(face[length - 2].asOLCvf2d(), face.back().asOLCvf2d(), face.front().asOLCvf2d());
-			}
+            renderPipeline.clear();
+        }
+    };
 
-			renderPipeline.clear();
-		}
-	};
+    class Face
+    {
+    public:
+        std::vector<Vec3D> vertices;
+        Renderer *renderer;
 
+        Face(std::vector<Vec3D> vertices, Renderer *renderer)
+        {
+            this->vertices = vertices;
+            this->renderer = renderer;
+        }
 
-	class Face
-	{
-	public:
-		std::vector<Vec3D> vertices;
-		Renderer* renderer;
+        void addToRenderPipeline()
+        {
+            std::vector<Vec2D> projectedVertices;
 
-		Face(std::vector<Vec3D> vertices, Renderer* renderer)
-		{
-			this->vertices = vertices;
-			this->renderer = renderer;
-		}
+            for (int i = 0; i < vertices.size(); i++)
+            {
+                Vec2D projectedVertex = renderer->getProjectedVertex(vertices[i]);
 
-		void addToRenderPipeline()
-		{
-			std::vector<Vec2D> projectedVertices;
+                // Offset points to make origin point center
+                projectedVertex.x += renderer->game->ScreenWidth() / 2;
+                projectedVertex.y += renderer->game->ScreenHeight() / 2;
 
-			for (int i = 0; i < vertices.size(); i++)
-			{
-				Vec2D projectedVertex = renderer->getProjectedVertex(vertices[i]);
+                projectedVertices.push_back(projectedVertex);
+            }
 
-				// Offset points to make origin point center
-				projectedVertex.x += renderer->game->ScreenWidth() / 2;
-				projectedVertex.y += renderer->game->ScreenHeight() / 2;
-
-				projectedVertices.push_back(projectedVertex);
-			}
-
-			renderer->renderPipeline.push_back(projectedVertices);
-		}
-	};
-}
+            renderer->renderPipeline.push_back(projectedVertices);
+        }
+    };
+} // namespace tce
