@@ -43,10 +43,23 @@
 */
 
 #pragma once
+
+#include <iostream>
 #include "olcPixelGameEngine.h"
 
 namespace tce
 {
+	/*
+	=======================================================================================================================
+		 _____						___
+		/			|			   /   \
+		|			|			  /_____\
+		|			|			 /	     \
+		\_____		|______		/	      \
+
+	=======================================================================================================================
+	*/
+
 	class Vec2D
 	{
 	public:
@@ -58,7 +71,13 @@ namespace tce
 			this->x = x;
 			this->y = y;
 		}
+
+		olc::vf2d asOLCvf2d()
+		{
+			return olc::vf2d(x, y);
+		}
 	};
+
 
 	class Vec3D
 	{
@@ -75,10 +94,12 @@ namespace tce
 		}
 	};
 
+
 	class Renderer
 	{
 	public:
 		olc::PixelGameEngine* game;
+		std::vector<std::vector<Vec2D>> renderPipeline;
 
 		Renderer(olc::PixelGameEngine* game)
 		{
@@ -88,6 +109,54 @@ namespace tce
 		Vec2D getProjectedVertex(Vec3D vertex)
 		{
 			return Vec2D(vertex.x, vertex.y); // Projection algorithm yet to be added
+		}
+
+		void render()
+		{
+			for (int i = 0; i < renderPipeline.size(); i++)
+			{
+				std::vector<Vec2D> face = renderPipeline[i];
+				int length = face.size();
+				for (int j = 0; j < length - 2; j++)
+				{
+					game->DrawTriangle(face[j].asOLCvf2d(), face[j + 1].asOLCvf2d(), face[j + 2].asOLCvf2d());
+				}
+				game->DrawTriangle(face[length - 1].asOLCvf2d(), face.back().asOLCvf2d(), face.front().asOLCvf2d());
+			}
+
+			renderPipeline.clear();
+		}
+	};
+
+
+	class Face
+	{
+	public:
+		Renderer* renderer;
+		std::vector<Vec3D> vertices;
+
+		/*Face(std::vector<Vec3D> vertices, Renderer* renderer)
+		{
+			this->renderer = renderer;
+			this->vertices = vertices;
+		}*/
+
+		void addToRenderPipeline()
+		{
+			std::vector<Vec2D> projectedVertices;
+
+			for (int i = 0; i < vertices.size(); i++)
+			{
+				Vec2D projectedVertex = renderer->getProjectedVertex(vertices[i]);
+
+				// Offset points to make origin point center
+				projectedVertex.x += renderer->game->ScreenWidth() / 2;
+				projectedVertex.y += renderer->game->ScreenHeight() / 2;
+
+				projectedVertices.push_back(projectedVertex);
+			}
+
+			renderer->renderPipeline.push_back(projectedVertices);
 		}
 	};
 }

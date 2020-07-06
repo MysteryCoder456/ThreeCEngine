@@ -6,6 +6,7 @@
 class TCEExample : public olc::PixelGameEngine
 {
 	tce::Renderer renderer = tce::Renderer(this);
+	float x = 0;
 
 public:
 	TCEExample()
@@ -19,11 +20,25 @@ public:
 		// Called once at the start, so create things here
 		return true;
 	}
-	
+
 	bool OnUserUpdate(float fElapsedTime) override
 	{
-		tce::Vec2D v = renderer.getProjectedVertex(tce::Vec3D(10, 10, 10));
-		std::cout << v.x << " " << v.y << std::endl;
+		Clear(olc::BLACK);
+
+		std::vector<tce::Vec3D> vertices;
+		vertices.push_back(tce::Vec3D(-100 + x, -100, 0));
+		vertices.push_back(tce::Vec3D(-100 + x, 100, 0));
+		vertices.push_back(tce::Vec3D(100 + x, 100, 0));
+		vertices.push_back(tce::Vec3D(100 + x, -100, 0));
+
+		tce::Face face;
+		face.renderer = &renderer;
+		face.vertices = vertices;
+		face.addToRenderPipeline();
+
+		renderer.render();
+
+		x += 10 * fElapsedTime;
 
 		return true;
 	}
@@ -32,7 +47,7 @@ public:
 int main()
 {
 	TCEExample app;
-	if (app.Construct(256, 240, 4, 4))
+	if (app.Construct(1024, 750, 1, 1))
 		app.Start();
 	return 0;
 }
