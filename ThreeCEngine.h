@@ -51,23 +51,6 @@
 
 namespace tce
 {
-    class Vec2D
-    {
-    public:
-        float x;
-        float y;
-
-        Vec2D(float x, float y)
-        {
-            this->x = x;
-            this->y = y;
-        }
-
-        olc::vf2d asOLCvf2d()
-        {
-            return olc::vf2d(x, y);
-        }
-    };
 
     class Vec3D
     {
@@ -105,27 +88,27 @@ namespace tce
         olc::PixelGameEngine *game;
         Options options;
         Camera camera;
-        std::vector<std::vector<Vec2D>> renderPipeline;
+        std::vector<std::vector<olc::vf2d>> renderPipeline;
 
         Renderer(olc::PixelGameEngine *game)
         {
             this->game = game;
         }
 
-        Vec2D getProjectedVertex(Vec3D vertex)
+        olc::vf2d getProjectedVertex(Vec3D vertex)
         {
             if (vertex.z > options.renderDistance[0] + camera.position.z && vertex.z < options.renderDistance[1] + camera.position.z)
             {
-                Vec2D projectedVertex = Vec2D(
+                olc::vf2d projectedVertex = olc::vf2d(
                     options.fov * (vertex.x - camera.position.x) / (vertex.z - camera.position.z),
                     options.fov * (vertex.y - camera.position.y) / (vertex.z - camera.position.z));
                 return projectedVertex;
             }
             else
-                return Vec2D(INVALID, INVALID);
+                return olc::vf2d(INVALID, INVALID);
         }
 
-        bool vertexIsValid(Vec2D vertex)
+        bool vertexIsValid(olc::vf2d vertex)
         {
             return !(vertex.x == INVALID && vertex.y == INVALID);
         }
@@ -134,13 +117,13 @@ namespace tce
         {
             for (int i = 0; i < renderPipeline.size(); i++)
             {
-                std::vector<Vec2D> face = renderPipeline[i];
+                std::vector<olc::vf2d> face = renderPipeline[i];
                 int length = face.size();
 
                 // Triangulation algorithm only for convex shapes
                 for (int j = 1; j < length - 1; j++)
                     if (vertexIsValid(face[0]) && vertexIsValid(face[j]) && vertexIsValid(face[j + 1]))
-                        game->FillTriangle(face[0].asOLCvf2d(), face[j].asOLCvf2d(), face[j + 1].asOLCvf2d());
+                        game->FillTriangle(face[0], face[j], face[j + 1]);
             }
 
             renderPipeline.clear();
@@ -151,21 +134,19 @@ namespace tce
     {
     public:
         std::vector<Vec3D> vertices;
-        Renderer *renderer;
 
-        Face(std::vector<Vec3D> vertices, Renderer *renderer)
+        Face(std::vector<Vec3D> vertices)
         {
             this->vertices = vertices;
-            this->renderer = renderer;
         }
 
-        void addToRenderPipeline()
+        void addToRenderPipeline(Renderer *renderer)
         {
-            std::vector<Vec2D> projectedVertices;
+            std::vector<olc::vf2d> projectedVertices;
 
             for (int i = 0; i < vertices.size(); i++)
             {
-                Vec2D projectedVertex = renderer->getProjectedVertex(vertices[i]);
+                olc::vf2d projectedVertex = renderer->getProjectedVertex(vertices[i]);
 
                 // Offset points to make origin point center
                 projectedVertex.x += renderer->game->ScreenWidth() / 2;
@@ -177,4 +158,54 @@ namespace tce
             renderer->renderPipeline.push_back(projectedVertices);
         }
     };
+
+    void DrawCube(Vec3D position, Vec3D size, Renderer *renderer)
+    {
+        size.z /= 5; // To counteract weird projection glitches
+
+        std::vector<Vec3D> frontVertices = {Vec3D(position),
+                                            Vec3D(position.x, position.y + size.y, position.z),
+                                            Vec3D(position.x + size.x, position.y + size.y, position.z),
+                                            Vec3D(position.x + size.x, position.y, position.z)};
+
+        std::vector<Vec3D> backVertices = {Vec3D(position.x, position.y, position.z + size.z),
+                                           Vec3D(position.x, position.y + size.y, position.z + size.z),
+                                           Vec3D(position.x + size.x, position.y + size.y, position.z + size.z),
+                                           Vec3D(position.x + size.x, position.y, position.z + size.z)};
+
+        std::vector<Vec3D> leftVertices = {Vec3D(position),
+                                           Vec3D(position.x, position.y, position.z + size.z),
+                                           Vec3D(position.x, position.y + size.y, position.z + size.z),
+                                           Vec3D(position.x, position.y + size.y, position.z)};
+
+        std::vector<Vec3D> rightVertices = {Vec3D(position.x + size.x, position.y, position.z),
+                                            Vec3D(position.x + size.x, position.y, position.z + size.z),
+                                            Vec3D(position.x + size.x, position.y + size.y, position.z + size.z),
+                                            Vec3D(position.x + size.x, position.y + size.y, position.z)};
+
+        std::vector<Vec3D> topVertices = {Vec3D(position),
+                                          Vec3D(position.x, position.y, position.z + size.z),
+                                          Vec3D(position.x + size.x, position.y, position.z + size.z),
+                                          Vec3D(position.x + size.x, position.y, position.z)};
+
+        std::vector<Vec3D> bottomVertices = {Vec3D(position.x, position.y + size.y, position.z),
+                                             Vec3D(position.x, position.y + size.y, position.z + size.z),
+                                             Vec3D(position.x + size.x, position.y + size.y, position.z + size.z),
+                                             Vec3D(position.x + size.x, position.y + size.y, position.z)};
+
+        Face front(frontVertices);
+        Face back(backVertices);
+        Face left(leftVertices);
+        Face right(rightVertices);
+        Face top(topVertices);
+        Face bottom(bottomVertices);
+
+        front.addToRenderPipeline(renderer);
+        back.addToRenderPipeline(renderer);
+        left.addToRenderPipeline(renderer);
+        right.addToRenderPipeline(renderer);
+        top.addToRenderPipeline(renderer);
+        bottom.addToRenderPipeline(renderer);
+    }
+
 } // namespace tce
