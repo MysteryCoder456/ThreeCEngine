@@ -122,9 +122,7 @@ namespace tce
                 return projectedVertex;
             }
             else
-            {
                 return Vec2D(INVALID, INVALID);
-            }
         }
 
         bool vertexIsValid(Vec2D vertex)
@@ -138,13 +136,11 @@ namespace tce
             {
                 std::vector<Vec2D> face = renderPipeline[i];
                 int length = face.size();
-                for (int j = 0; j < length - 2; j++)
-                {
-                    if (vertexIsValid(face[j]) && vertexIsValid(face[j + 1]) && vertexIsValid(face[j + 2]))
-                        game->FillTriangle(face[j].asOLCvf2d(), face[j + 1].asOLCvf2d(), face[j + 2].asOLCvf2d());
-                }
-                if (vertexIsValid(face.back()) && vertexIsValid(face.front()) && vertexIsValid(face[0]))
-                    game->FillTriangle(face[length - 2].asOLCvf2d(), face.back().asOLCvf2d(), face.front().asOLCvf2d());
+
+                // Triangulation algorithm only for convex shapes
+                for (int j = 1; j < length - 1; j++)
+                    if (vertexIsValid(face[0]) && vertexIsValid(face[j]) && vertexIsValid(face[j + 1]))
+                        game->FillTriangle(face[0].asOLCvf2d(), face[j].asOLCvf2d(), face[j + 1].asOLCvf2d());
             }
 
             renderPipeline.clear();

@@ -13,20 +13,19 @@ public:
     TCEExample()
     {
         sAppName = "ThreeCEngine Example";
+        renderer.options.renderDistance[0] = 5; // Set the near render distance to 5
     }
 
 public:
     bool OnUserCreate() override
     {
         // Called once at the start, so create things here
-        vertices.push_back(tce::Vec3D(-50, -50, 50));
-        vertices.push_back(tce::Vec3D(-50, 50, 50));
-        vertices.push_back(tce::Vec3D(50, 50, 50));
-        vertices.push_back(tce::Vec3D(50, -50, 50));
-        vertices.push_back(tce::Vec3D(50, -50, 25));
-        vertices.push_back(tce::Vec3D(50, 50, 25));
-        vertices.push_back(tce::Vec3D(-50, 50, 25));
-        vertices.push_back(tce::Vec3D(-50, -50, 25));
+        vertices.push_back(tce::Vec3D(0, -50, 50));
+        vertices.push_back(tce::Vec3D(-50, -25, 50));
+        vertices.push_back(tce::Vec3D(-25, 50, 50));
+        vertices.push_back(tce::Vec3D(25, 50, 50));
+        vertices.push_back(tce::Vec3D(50, -25, 50));
+
         return true;
     }
 
@@ -34,8 +33,8 @@ public:
     {
         Clear(olc::BLACK);
 
-        z += fElapsedTime * 15;
-        renderer.camera.position.x = z;
+        z += fElapsedTime * 10;
+        renderer.camera.position.z = z;
 
         tce::Face face(vertices, &renderer);
         face.addToRenderPipeline();
