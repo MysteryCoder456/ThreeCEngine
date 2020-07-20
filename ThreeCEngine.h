@@ -125,7 +125,7 @@ namespace tce
             for (int i = 0; i < renderPipeline.size(); i++)
             {
                 std::vector<olc::vf2d> face = renderPipeline[i];
-                int length = face.size();
+                unsigned long length = face.size();
 
                 // Triangulation algorithm only for convex shapes
                 for (int j = 1; j < length - 1; j++)
