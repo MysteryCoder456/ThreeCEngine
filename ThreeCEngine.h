@@ -40,6 +40,13 @@
 
 	Compiling intructions are given in olcPixelGameEngine.h, but make sure both of these
 	headers are present in your workspace beforehand.
+ 
+    Compiling on Mac
+    ~~~~~~~~~~~~~~~~
+ 
+    The official version of olcPGE does not support MacOS. The olcPGE Header in this Xcode Project
+    is a fork of the original version to support Macs. You will require Xcode to run this Xcode
+    Project. Source: https://github.com/MumflrFumperdink/olcPGEMac
 */
 
 #pragma once
