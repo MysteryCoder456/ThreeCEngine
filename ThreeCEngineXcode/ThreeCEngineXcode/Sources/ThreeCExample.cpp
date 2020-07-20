@@ -1,7 +1,7 @@
 #include <iostream>
 
 #define OLC_PGE_APPLICATION
-#include "olcPixelGameEngineMac.h"
+#include "olcPixelGameEngine.h"
 #include "ThreeCEngine.h"
 
 class TCEExample : public olc::PixelGameEngine

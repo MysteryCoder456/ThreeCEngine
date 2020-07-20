@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		C95A95E224C5778000BA74B9 /* ThreeCExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C95A95E124C5778000BA74B9 /* ThreeCExample.cpp */; };
+		C95A95F024C57AE700BA74B9 /* ThreeCExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C95A95EF24C57AE700BA74B9 /* ThreeCExample.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -24,9 +24,9 @@
 
 /* Begin PBXFileReference section */
 		C95A95DE24C5778000BA74B9 /* ThreeCEngineXcode */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ThreeCEngineXcode; sourceTree = BUILT_PRODUCTS_DIR; };
-		C95A95E124C5778000BA74B9 /* ThreeCExample.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ThreeCExample.cpp; sourceTree = "<group>"; };
 		C95A95EB24C577CE00BA74B9 /* ThreeCEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ThreeCEngine.h; path = ../../../ThreeCEngine.h; sourceTree = "<group>"; };
 		C95A95EC24C578C600BA74B9 /* olcPixelGameEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = olcPixelGameEngine.h; sourceTree = "<group>"; };
+		C95A95EF24C57AE700BA74B9 /* ThreeCExample.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ThreeCExample.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,7 +68,7 @@
 		C95A95E924C5779F00BA74B9 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				C95A95E124C5778000BA74B9 /* ThreeCExample.cpp */,
+				C95A95EF24C57AE700BA74B9 /* ThreeCExample.cpp */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -139,7 +139,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C95A95E224C5778000BA74B9 /* ThreeCExample.cpp in Sources */,
+				C95A95F024C57AE700BA74B9 /* ThreeCExample.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
