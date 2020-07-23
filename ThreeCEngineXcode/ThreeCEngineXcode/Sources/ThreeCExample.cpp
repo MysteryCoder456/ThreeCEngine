@@ -30,7 +30,7 @@ public:
         z += fElapsedTime * 10;
         renderer.camera.position.y = z;
 
-        tce::DrawCube(tce::Vec3D(-25, -25, 25), tce::Vec3D(50, 50, 50), &renderer);
+        tce::DrawCube({-25, -25, 25}, {50, 50, 50}, &renderer);
 
         renderer.render();
         return true;

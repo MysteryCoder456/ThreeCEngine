@@ -59,22 +59,15 @@
 namespace tce
 {
 
-    class Vec3D
+    struct Vec3D
     {
     public:
         float x;
         float y;
         float z;
-
-        Vec3D(float x, float y, float z)
-        {
-            this->x = x;
-            this->y = y;
-            this->z = z;
-        }
     };
 
-    /// ONLY TO BE USED BY THE RENDERER CLASS
+    // ONLY TO BE USED BY THE RENDERER CLASS
     // YOU CAN CHANGE THE OPTIONS BY REFERING TO THEM FROM A RENDERER INSTANCE
     struct Options
     {
@@ -86,7 +79,7 @@ namespace tce
     // YOU CAN CHANGE THE CAMERA PROPERTIES BY REFERING TO THEM FROM A RENDERER INSTANCE
     struct Camera
     {
-        Vec3D position = Vec3D(0, 0, 0);
+        Vec3D position = {0, 0, 0};
     };
 
     class Renderer
@@ -170,35 +163,47 @@ namespace tce
     {
         size.z /= 5; // To counteract weird projection glitches
 
-        std::vector<Vec3D> frontVertices = {Vec3D(position),
-                                            Vec3D(position.x, position.y + size.y, position.z),
-                                            Vec3D(position.x + size.x, position.y + size.y, position.z),
-                                            Vec3D(position.x + size.x, position.y, position.z)};
+        std::vector<Vec3D> frontVertices = {
+            position,
+            {position.x, position.y + size.y, position.z},
+            {position.x + size.x, position.y + size.y, position.z},
+            {position.x + size.x, position.y, position.z}
+        };
 
-        std::vector<Vec3D> backVertices = {Vec3D(position.x, position.y, position.z + size.z),
-                                           Vec3D(position.x, position.y + size.y, position.z + size.z),
-                                           Vec3D(position.x + size.x, position.y + size.y, position.z + size.z),
-                                           Vec3D(position.x + size.x, position.y, position.z + size.z)};
+        std::vector<Vec3D> backVertices = {
+            {position.x, position.y, position.z + size.z},
+            {position.x, position.y + size.y, position.z + size.z},
+            {position.x + size.x, position.y + size.y, position.z + size.z},
+            {position.x + size.x, position.y, position.z + size.z}
+        };
 
-        std::vector<Vec3D> leftVertices = {Vec3D(position),
-                                           Vec3D(position.x, position.y, position.z + size.z),
-                                           Vec3D(position.x, position.y + size.y, position.z + size.z),
-                                           Vec3D(position.x, position.y + size.y, position.z)};
+        std::vector<Vec3D> leftVertices = {
+            position,
+            {position.x, position.y, position.z + size.z},
+            {position.x, position.y + size.y, position.z + size.z},
+            {position.x, position.y + size.y, position.z}
+        };
 
-        std::vector<Vec3D> rightVertices = {Vec3D(position.x + size.x, position.y, position.z),
-                                            Vec3D(position.x + size.x, position.y, position.z + size.z),
-                                            Vec3D(position.x + size.x, position.y + size.y, position.z + size.z),
-                                            Vec3D(position.x + size.x, position.y + size.y, position.z)};
+        std::vector<Vec3D> rightVertices = {
+            {position.x + size.x, position.y, position.z},
+            {position.x + size.x, position.y, position.z + size.z},
+            {position.x + size.x, position.y + size.y, position.z + size.z},
+            {position.x + size.x, position.y + size.y, position.z}
+          };
 
-        std::vector<Vec3D> topVertices = {Vec3D(position),
-                                          Vec3D(position.x, position.y, position.z + size.z),
-                                          Vec3D(position.x + size.x, position.y, position.z + size.z),
-                                          Vec3D(position.x + size.x, position.y, position.z)};
+        std::vector<Vec3D> topVertices = {
+            position,
+            {position.x, position.y, position.z + size.z},
+            {position.x + size.x, position.y, position.z + size.z},
+            {position.x + size.x, position.y, position.z}
+        };
 
-        std::vector<Vec3D> bottomVertices = {Vec3D(position.x, position.y + size.y, position.z),
-                                             Vec3D(position.x, position.y + size.y, position.z + size.z),
-                                             Vec3D(position.x + size.x, position.y + size.y, position.z + size.z),
-                                             Vec3D(position.x + size.x, position.y + size.y, position.z)};
+        std::vector<Vec3D> bottomVertices = {
+            {position.x, position.y + size.y, position.z},
+            {position.x, position.y + size.y, position.z + size.z},
+            {position.x + size.x, position.y + size.y, position.z + size.z},
+            {position.x + size.x, position.y + size.y, position.z}
+        };
 
         Face front(frontVertices);
         Face back(backVertices);
